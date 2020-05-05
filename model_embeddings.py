@@ -39,6 +39,14 @@ class ModelEmbeddings(nn.Module):
         super(ModelEmbeddings, self).__init__()
 
         ### YOUR CODE HERE for part 1h
+        self.word_embed_size = word_embed_size
+        self.vocab = vocab
+        self.char_embed_size = 50
+        self.dropout_prob = 0.3
+        self.embedding = nn.Embedding(num_embeddings=len(self.vocab.char2id), embedding_dim=self.char_embed_size, padding_idx=self.vocab.char_pad)
+        self.cnn = CNN(self.char_embed_size, self.word_embed_size)
+        self.highway = Highway(self.word_embed_size)
+        self.dropout = nn.Dropout(p=self.dropout_prob)
 
         ### END YOUR CODE
 
@@ -52,6 +60,11 @@ class ModelEmbeddings(nn.Module):
             CNN-based embeddings for each word of the sentences in the batch
         """
         ### YOUR CODE HERE for part 1h
-
+        x_emb = self.embedding(input)
+        x_reshaped = x_emb.transpose(2, 3)
+        x_conv_out = self.cnn(x_reshaped)
+        x_highway = self.highway(x_conv_out)
+        x_word_emb = self.dropout(x_highway)
+        return x_word_emb
         ### END YOUR CODE
 

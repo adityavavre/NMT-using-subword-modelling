@@ -12,7 +12,7 @@ import torch.nn.functional as F
 class CNN(nn.Module):
     # Remember to delete the above 'pass' after your implementation
     ### YOUR CODE HERE for part 1g
-    def __init__(self, char_embed_size, word_embed_size, max_word_len, kernel_size=5, padding=1):
+    def __init__(self, char_embed_size, word_embed_size, kernel_size=5, padding=1):
         """ Init CNN module
         @param char_embed_size (int): The size of the character embeddings (dimensionality)
         @param word_embed_size (int): The size of the final word embedding (dimensionality)
@@ -26,9 +26,7 @@ class CNN(nn.Module):
         self.padding = padding
         self.in_channels = char_embed_size
         self.out_channels = word_embed_size
-        self.max_pool_kernel = max_word_len-self.kernel_size+1
         self.conv = nn.Conv1d(in_channels=self.in_channels, out_channels=self.out_channels, kernel_size=self.kernel_size, stride=1, padding=self.padding, bias=True)
-        self.maxpool = nn.MaxPool1d(kernel_size=self.max_pool_kernel)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """ Take a mini-batch of reshaped inputs(x_reshaped) and compute the output from the Conv1d network
@@ -38,7 +36,10 @@ class CNN(nn.Module):
                                 through the 1D convolution network
         """
         x_conv = self.conv(input)
-        x_conv_out = self.maxpool(F.relu(x_conv))
+        max_word_len = input.shape[3]
+        max_pool_kernel = max_word_len - self.kernel_size + 1
+        maxpool = nn.MaxPool1d(kernel_size=max_pool_kernel)
+        x_conv_out = maxpool(F.relu(x_conv))
         return x_conv_out
 
     ### END YOUR CODE
