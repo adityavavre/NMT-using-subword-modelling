@@ -35,11 +35,20 @@ class CNN(nn.Module):
         @return (torch.Tensor): output tensor with shape (max_sentence_length, batch_size, word_embed_size) after passing
                                 through the 1D convolution network
         """
-        x_conv = self.conv(input)
+        max_sentence_len = input.shape[0]
+        batch_size = input.shape[1]
+        embed_size = input.shape[2]
         max_word_len = input.shape[3]
+        # output_list = []
+        # for inp in input:
+        reshaped_input = input.contiguous().view(-1, embed_size, max_word_len)
+        x_conv = self.conv(reshaped_input)
         max_pool_kernel = max_word_len - self.kernel_size + 1
         maxpool = nn.MaxPool1d(kernel_size=max_pool_kernel)
-        x_conv_out = maxpool(F.relu(x_conv))
+        x_conv_out = maxpool(F.relu(x_conv)).squeeze(-1)
+        x_conv_out = x_conv_out.contiguous().view(max_sentence_len, batch_size, -1)
+        #     output_list.append(x_conv_out)
+        # x_conv_out = torch.stack(output_list)
         return x_conv_out
 
     ### END YOUR CODE

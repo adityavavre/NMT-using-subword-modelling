@@ -52,14 +52,14 @@ class VocabEntry(object):
             """ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]""")
 
         self.char2id = dict()  # Converts characters to integers
-        self.char2id['∏'] = 0  # <pad> token
+        self.char2id['<pad>'] = 0  # <pad> token
         self.char2id['{'] = 1  # start of word token
         self.char2id['}'] = 2  # end of word token
-        self.char2id['Û'] = 3  # <unk> token
+        self.char2id['<unk>'] = 3  # <unk> token
         for i, c in enumerate(self.char_list):
             self.char2id[c] = len(self.char2id)
-        self.char_pad = self.char2id['∏']
-        self.char_unk = self.char2id['Û']
+        self.char_pad = self.char2id['<pad>']
+        self.char_unk = self.char2id['<unk>']
         self.start_of_word = self.char2id["{"]
         self.end_of_word = self.char2id["}"]
         assert self.start_of_word + 1 == self.end_of_word
@@ -163,7 +163,7 @@ class VocabEntry(object):
         temp = self.words2charindices(sents)
         temp = pad_sents_char(temp, self.char_pad)
         sents_var = torch.tensor(temp, dtype = torch.long, device = device)
-        sents_var = sents_var.view(sents_var.shape[1], sents_var.shape[0], sents_var.shape[2]).contiguous()
+        sents_var = sents_var.contiguous().view(sents_var.shape[1], sents_var.shape[0], sents_var.shape[2]).contiguous()
         return sents_var
 
         ### END YOUR CODE

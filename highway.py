@@ -29,7 +29,7 @@ class Highway(nn.Module):
                                 through the highway layer
         """
         x_proj = F.relu(self.proj(conv_out))
-        x_gate = F.sigmoid(self.gate(conv_out))
+        x_gate = torch.sigmoid(self.gate(conv_out))
         x_highway = (x_gate*x_proj) + ((1-x_gate)*conv_out)
         return x_highway
 
