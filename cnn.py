@@ -12,7 +12,7 @@ import torch.nn.functional as F
 class CNN(nn.Module):
     # Remember to delete the above 'pass' after your implementation
     ### YOUR CODE HERE for part 1g
-    def __init__(self, char_embed_size, word_embed_size, kernel_size=5, padding=1):
+    def __init__(self, char_embed_size, word_embed_size, max_word_len=21, kernel_size=5, padding=1):
         """ Init CNN module
         @param char_embed_size (int): The size of the character embeddings (dimensionality)
         @param word_embed_size (int): The size of the final word embedding (dimensionality)
@@ -39,16 +39,12 @@ class CNN(nn.Module):
         batch_size = input.shape[1]
         embed_size = input.shape[2]
         max_word_len = input.shape[3]
-        # output_list = []
-        # for inp in input:
         reshaped_input = input.contiguous().view(-1, embed_size, max_word_len)
         x_conv = self.conv(reshaped_input)
-        max_pool_kernel = max_word_len - self.kernel_size + 1
+        max_pool_kernel = x_conv.shape[-1]
         maxpool = nn.MaxPool1d(kernel_size=max_pool_kernel)
-        x_conv_out = maxpool(F.relu(x_conv)).squeeze(-1)
+        x_conv_out = maxpool(F.relu(x_conv)).squeeze(dim = -1)
         x_conv_out = x_conv_out.contiguous().view(max_sentence_len, batch_size, -1)
-        #     output_list.append(x_conv_out)
-        # x_conv_out = torch.stack(output_list)
         return x_conv_out
 
     ### END YOUR CODE
