@@ -145,7 +145,7 @@ def question_1f_sanity_check(highway):
     max_sent_len = 5
     batch_size = 4
     input = torch.rand(max_sent_len, batch_size, EMBED_SIZE)
-    W_proj = torch.rand()
+    # W_proj = torch.rand()
 
 def main():
     """ Main func.
