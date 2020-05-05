@@ -27,6 +27,7 @@ class CNN(nn.Module):
         self.in_channels = char_embed_size
         self.out_channels = word_embed_size
         self.conv = nn.Conv1d(in_channels=self.in_channels, out_channels=self.out_channels, kernel_size=self.kernel_size, stride=1, padding=self.padding, bias=True)
+        self.maxpool = nn.AdaptiveMaxPool1d(1)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """ Take a mini-batch of reshaped inputs(x_reshaped) and compute the output from the Conv1d network
@@ -41,9 +42,7 @@ class CNN(nn.Module):
         max_word_len = input.shape[3]
         reshaped_input = input.contiguous().view(-1, embed_size, max_word_len)
         x_conv = self.conv(reshaped_input)
-        max_pool_kernel = x_conv.shape[-1]
-        maxpool = nn.MaxPool1d(kernel_size=max_pool_kernel)
-        x_conv_out = maxpool(F.relu(x_conv)).squeeze(dim = -1)
+        x_conv_out = self.maxpool(F.relu(x_conv)).squeeze(dim = -1)
         x_conv_out = x_conv_out.contiguous().view(max_sentence_len, batch_size, -1)
         return x_conv_out
 
